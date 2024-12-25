@@ -3,18 +3,20 @@
 # If run as main, prompts user to select a file, reads it, makes dataframe, and shows its head
 # 
 # Author Dusan Sormaz
-# Version 1.0.1 
+# Version 1.0.3
 # change log
-# Date          Author      Content
-# 11/22/2024    D. Sormaz   Intial implementation
-# 11/27/2024    D. Sormaz   Added multiple file selection options
+# Date          Version Author      Content
+# 11/22/2024    1.0.1   D. Sormaz   Intial implementation
+# 11/27/2024    1.0.2   D. Sormaz   Added multiple file selection options
+# 12/24/2024    1.0.3   D. Sormaz   Read file types from .env file
 from decouple import config
+from ast import literal_eval as make_tuple
 import pandas as pd
 import tkinter as tk
 from tkinter import filedialog
 # code to handle file types
 # need to generalize it
-filetypes = (
+filetypes_0 = (
             ("Excel files", "*.xlsx"), 
             ("Text files", "*.txt"),
             ("CSV files", "*.csv"),
@@ -29,6 +31,10 @@ try:
     SELECTION_MODE = config('SELECTION_MODE')
 except:
     SELECTION_MODE = 'single'
+try:
+    filetypes = make_tuple(config('FILE_TYPES'))
+except:
+    filetypes = filetypes_0
 
 def getFile():
     root = tk.Tk()
@@ -46,7 +52,7 @@ def getDataFrameFromFile(file):
     if file.endswith('xlsx'):
         df = pd.read_excel(file)
     elif file.endswith('csv'):
-        df = pd.reads_csv(file)
+        df = pd.read_csv(file)
     else:
         ext = file[file.rindex('.'):]
         raise NotImplementedError (f'Not supported file extension: {ext}')
@@ -71,5 +77,5 @@ if __name__ == "__main__":
         print(f_list)
         df = getDataFrameFromFile(f_list[0])
         print(df.head())
-else:
-    print(f'Incorrect selection mode env variable: {SELECTION_MODE}')
+    else:
+        print(f'Incorrect selection mode env variable: {SELECTION_MODE}')
