@@ -3,12 +3,14 @@
 # If run as main, prompts user to select a file, reads it, makes dataframe, and shows its head
 # 
 # Author Dusan Sormaz
-# Version 1.0.3
+# Version 1.0.4
 # change log
 # Date          Version Author      Content
 # 11/22/2024    1.0.1   D. Sormaz   Intial implementation
 # 11/27/2024    1.0.2   D. Sormaz   Added multiple file selection options
 # 12/24/2024    1.0.3   D. Sormaz   Read file types from .env file
+# 01/12/2025    1.0.4   D. Sormaz   Implemented getFilesDataFrames, whci returns a dictionary with 
+#                                   files as key and data frames as values
 from decouple import config
 from ast import literal_eval as make_tuple
 import pandas as pd
