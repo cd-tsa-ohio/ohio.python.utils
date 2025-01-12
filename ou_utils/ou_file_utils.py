@@ -68,6 +68,14 @@ def getDataFrames():
 def getDataFrame():
         return getDataFrameFromFile(getFile())
 
+def getFilesDataFrames ():
+    files = getFiles()
+    files_dataframes = {}
+    for f in files:
+        df = getDataFrame(f)
+        files_dataframes[f] = df
+    return files_dataframes
+
 if __name__ == "__main__":
     if SELECTION_MODE.lower() == 'single':
         df = getDataFrame()
