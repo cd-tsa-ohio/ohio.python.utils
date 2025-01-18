@@ -5,10 +5,10 @@ from feature_selection_module import feature_selection_max  # Import the feature
 def createResourcesTable(select_func=feature_selection_max):
    
     # Step 1: Prompt user to select files using ou.getFiles()
-    selected_files = ou.getFiles()
+  #  selected_files = ou.getFiles()
 
     # Step 2: Load the selected files into DataFrames
-    fs_drs = ou.getFilesDataFrames(selected_files)
+    fs_drs = ou.getFilesDataFrames()
 
     # Step 3: Prepare a list to accumulate rows for the resources table
     resources_data = []
@@ -22,7 +22,7 @@ def createResourcesTable(select_func=feature_selection_max):
         for index, row in filtered_df.iterrows():
             # Add machine as a resource
             resources_data.append({
-                "ResourceName": row["Machines"],  # Assuming 'Machines' is in the filtered DataFrame
+                "ResourceName": row["Machine"],  # Assuming 'Machines' is in the filtered DataFrame
                 "ObjectType": "Machine",  # Keep 'Machine' for machines
                 "XLocation": 0,  # Default X location
                 "YLocation": 0,  # Default Y location
@@ -32,7 +32,7 @@ def createResourcesTable(select_func=feature_selection_max):
 
             # Add tool as a resource
             resources_data.append({
-                "ResourceName": row["tools"],  # Assuming 'tools' is in the filtered DataFrame
+                "ResourceName": row["Tool"],  # Assuming 'tools' is in the filtered DataFrame
                 "ObjectType": "Resources",  # Use 'Resources' for tools
                 "XLocation": 0,  # Default X location
                 "YLocation": 0,  # Default Y location
@@ -44,3 +44,7 @@ def createResourcesTable(select_func=feature_selection_max):
     resources_table = pd.DataFrame(resources_data)
 
     return resources_table
+
+if __name__ == "__main__":
+    resources_table = createResourcesTable()
+    print(resources_table)
