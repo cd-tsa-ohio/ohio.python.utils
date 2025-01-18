@@ -11,6 +11,7 @@
 # 12/24/2024    1.0.3   D. Sormaz   Read file types from .env file
 # 01/12/2025    1.0.4   D. Sormaz   Implemented getFilesDataFrames, whci returns a dictionary with 
 #                                   files as key and data frames as values
+# 01/18/2025    1.0.5   D. Sormaz   fixed the bug in line 77, call to getDataFrameFromFile()
 from decouple import config
 from ast import literal_eval as make_tuple
 import pandas as pd
@@ -74,7 +75,7 @@ def getFilesDataFrames ():
     files = getFiles()
     files_dataframes = {}
     for f in files:
-        df = getDataFrame(f)
+        df = getDataFrameFromFile(f)
         files_dataframes[f] = df
     return files_dataframes
 
