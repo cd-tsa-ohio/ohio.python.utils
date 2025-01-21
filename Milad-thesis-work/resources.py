@@ -33,9 +33,9 @@ def getResources(DataFrame):
             })
             seen_resources.add((row["Machine"], "Machine"))
         
-        
+    for index, row in DataFrame.iterrows(): 
         # Add tool as a resource if not already added
-        if (row["Tool"], "Tool") not in seen_resources:
+        if (row["Tool"], "Resources") not in seen_resources:
             resources_data.append({
                 "ResourceName": row["Tool"],  # Assuming 'tools' is in the filtered DataFrame
                 "ObjectType": "Resources",  # Use 'Resources' for tools
@@ -44,7 +44,7 @@ def getResources(DataFrame):
                 "ZLocation": 0,  # Default Z location
                 "InitialCapacity": 1  # Default initial capacity
                 })
-            seen_resources.add((row["Tool"], "Tool"))
+            seen_resources.add((row["Tool"], "Resources"))
 
     # Step 6: Convert the list of dictionaries to a DataFrame
     resources_table = pd.DataFrame(resources_data)
