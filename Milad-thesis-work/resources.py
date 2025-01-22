@@ -38,7 +38,7 @@ def getResources(DataFrame):
         if (row["Tool"], "Resources") not in seen_resources:
             resources_data.append({
                 "ResourceName": row["Tool"],  # Assuming 'tools' is in the filtered DataFrame
-                "ObjectType": "Resources",  # Use 'Resources' for tools
+                "ObjectType": "Resource",  # Use 'Resources' for tools
                 "XLocation": 0,  # Default X location
                 "YLocation": 0,  # Default Y location
                 "ZLocation": 0,  # Default Z location
