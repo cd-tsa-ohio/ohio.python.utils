@@ -12,6 +12,7 @@
 # 01/12/2025    1.0.4   D. Sormaz   Implemented getFilesDataFrames, whci returns a dictionary with 
 #                                   files as key and data frames as values
 # 01/18/2025    1.0.5   D. Sormaz   fixed the bug in line 77, call to getDataFrameFromFile()
+# 01/21/2025    1.0.6   D. Sormaz   simplified default values, lines 30 - ...
 from decouple import config
 from ast import literal_eval as make_tuple
 import pandas as pd
@@ -26,14 +27,8 @@ filetypes_0 = (
             ("All files", "*.*")
         )
 
-try: 
-    DATA_FOLDER = config('DATA_FOLDER')
-except:
-    DATA_FOLDER = '.'
-try:
-    SELECTION_MODE = config('SELECTION_MODE')
-except:
-    SELECTION_MODE = 'single'
+DATA_FOLDER = config('DATA_FOLDER', default = '.')
+SELECTION_MODE = config('SELECTION_MODE', default = 'single')
 try:
     filetypes = make_tuple(config('FILE_TYPES'))
 except:
