@@ -72,7 +72,7 @@ if __name__ == "__main__":
 from feature_selection_module import feature_selection_max, feature_selection_min, feature_selection_median #import all three functions from the feature_selection_module
 
 # Load DataFrames using ou_file_utils
-dfs = ou.getDataFrames()
+# dfs = ou.getDataFrames()
 
 # Process each DataFrame using the imported functions
 if False:
