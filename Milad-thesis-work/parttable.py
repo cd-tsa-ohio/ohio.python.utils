@@ -23,7 +23,7 @@ def partTable(file_names):
        #handle tuple or string
         file_path = file[0] if isinstance(file, tuple) else file
        
-        new_fn = file_path[file_path.rfind('/') + 1 : file_path.rfind('.')] #adding ". so it can support all type of files"
+        new_fn = partName(file_path)
         
         #add 1 to base_mix in case there is a remainder
         part_mix = base_mix + (1 if i < remainder else 0)
@@ -41,6 +41,9 @@ def partTable(file_names):
     part_table = pd.DataFrame(part_data)
 
     return part_table
+def partName(file_path):
+    new_fn = file_path[file_path.rfind('/') + 1 : file_path.rfind('.')] #adding ". so it can support all type of files"
+    return new_fn
 
 if __name__ == "__main__":
     df=ou.getFiles()
