@@ -4,7 +4,7 @@ from parttable import partTable
 from feature_selection_module import feature_selection_max
 
 def PartRoutings(partName,input_df):
-    output_df = 
+    output_df = pd.DataFrame
     try:
         
         # Create PartDestinationID based on the number of rows in the input dataframe
