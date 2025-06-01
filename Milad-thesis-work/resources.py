@@ -35,7 +35,7 @@ def getResources(DataFrame):
         
     for index, row in DataFrame.iterrows(): 
         # Add tool as a resource if not already added
-        if (row["Tool"], "Resources") not in seen_resources:
+        if (row["Tool"], "Resource") not in seen_resources:
             resources_data.append({
                 "ResourceName": row["Tool"],  # Assuming 'tools' is in the filtered DataFrame
                 "ObjectType": "Resource",  # Use 'Resources' for tools
@@ -44,14 +44,31 @@ def getResources(DataFrame):
                 "ZLocation": 0,  # Default Z location
                 "InitialCapacity": 1  # Default initial capacity
                 })
-            seen_resources.add((row["Tool"], "Resources"))
+            seen_resources.add((row["Tool"], "Resource"))
+
+    return pd.DataFrame(resources_data)
 
     # Step 6: Convert the list of dictionaries to a DataFrame
-    resources_table = pd.DataFrame(resources_data)
+    #resources_table = pd.DataFrame(resources_data)
 
-    return resources_table
+    #return resources_table
 
-if __name__ == "__main__":
-    df=ou.getDataFrame()
-    resources_table = getResources(df)
+#make another function getallResources which will take list of dataframes
+
+def getAllResources(dataframes_list):
+    all_resources = pd.DataFrame()
+    for df in dataframes_list:
+        table = getResources(df)
+        all_resources = pd.concat([all_resources, table], ignore_index=True)
+    return all_resources.drop_duplicates(subset=["ResourceName", "ObjectType"])
+
+
+if __name__ == "__main__": #get in a loop 
+    dataframes_list = ou.getDataFrames()  # list of DataFrames
+    resources_table = getAllResources(dataframes_list)
     print(resources_table)
+    
+    
+    #df=ou.getDataFrames() # add get dataframes() for multiple files and test try
+    #resources_table = getResources(df)
+    #print(resources_table)

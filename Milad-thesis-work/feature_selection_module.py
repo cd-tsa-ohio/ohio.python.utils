@@ -65,35 +65,16 @@ def feature_selection_median(df):
 #running the functions to make sure they give correct answer and dataframe format
 
 if __name__ == "__main__":
-    df = ou.getDataFrame()
-    max_processing_time_df = feature_selection_max(df)
+    df = ou.getDataFrames()
+    
+    # Handle if df is a list of DataFrames
+    if isinstance(df, list):
+        df = df[0] if df else pd.DataFrame()
+    
+    # Show the actual columns
+    print("Input columns:", df.columns.tolist())
+    
+    # Run feature selection
+    max_processing_time_df = feature_selection_min(df)
+    print("Filtered DataFrame:")
     print(max_processing_time_df)
-
-from feature_selection_module import feature_selection_max, feature_selection_min, feature_selection_median #import all three functions from the feature_selection_module
-
-# Load DataFrames using ou_file_utils
-# dfs = ou.getDataFrames()
-
-# Process each DataFrame using the imported functions
-if False:
-    for file_info in dfs:
-        file_name = file_info['file_name']  # Extract file name
-        df = file_info['data']             # Extract DataFrame
-        print(f"Processing file: {file_name}\n")
-
-        # Maximum processing time
-        max_df = feature_selection_max(df)
-        print(f"Features with Maximum Processing Time for DataFrame {file_name}\n:")
-        print(max_df, "\n")
-        
-        # Minimum processing time
-        min_df = feature_selection_min(df)
-        print(f"Features with Minimum Processing Time for DataFrame {file_name}\n:")
-        print(min_df, "\n")
-        
-        # Median processing time
-        median_df = feature_selection_median(df)
-        print(f"Features with Median Processing Time for DataFrame {file_name}\n:")
-        print(median_df, "\n")
-
-
