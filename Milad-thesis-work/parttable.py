@@ -4,7 +4,6 @@ import ou_file_utils as ou
 
 def partTable(file_names):
 
-    
     #number of files calculation
     total_files = len(file_names)
 
