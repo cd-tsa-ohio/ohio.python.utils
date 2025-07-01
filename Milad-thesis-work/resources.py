@@ -1,42 +1,76 @@
+import os
+from dotenv import load_dotenv
 import pandas as pd
 import ou_file_utils as ou
-from feature_selection_module import feature_selection_max  # Import the feature selection function
+from feature_selection_module import feature_selection_max
+
+load_dotenv()
+
+def lookup_coordinates(object_type: str, resource_name: str):
+    """
+    Returns (x, y, z, capacity) as floats/ints from .env or defaults.
+    """
+    key = f"{object_type.upper()}_{resource_name}".upper().replace(" ", "_")
+    
+    # If not found, fallback to RESOURCE_DEFAULT or generic default
+    loc = os.getenv(key)
+    if not loc and object_type == "Resource":
+        loc = os.getenv("RESOURCE_DEFAULT")
+    
+    if loc:
+        try:
+            x, y, z, cap = map(float, loc.split(","))
+            return x, y, z, int(cap)
+        except ValueError:
+            pass
+    
+    # Fallback if nothing found or malformed
+    return 0.0, 0.0, 0.0, 1
 
 def getResources(DataFrame):
-   
-   
     resources_data = []
-
-    #duplicates removal step
     seen_resources = set()
-       
-    for index, row in DataFrame.iterrows():
-            # Add machine as a resource if not already added
-        if (row["Machine"], "Machine") not in seen_resources:
+
+    for _, row in DataFrame.iterrows():
+        # Machines
+        machine_name = row["Machine"]
+        if (machine_name, "Machine") not in seen_resources:
+            x, y, z, cap = lookup_coordinates("Machine", machine_name)
+
+            # Derive ObjectType from machine_name (strip 'Cnc' if present)
+            object_type = machine_name[3:] if machine_name.lower().startswith("cnc") else machine_name
+
             resources_data.append({
-                "ResourceName": row["Machine"],  # Assuming 'Machines' is in the filtered DataFrame
-                "ObjectType": "Machine",  # Keep 'Machine' for machines
-                "XLocation": 0,  # Default X location
-                "YLocation": 0,  # Default Y location
-                "ZLocation": 0,  # Default Z location
-                "InitialCapacity": 1  # Default initial capacity
+                "ResourceName": machine_name,
+                "ObjectType": object_type,
+                "XLocation": x,
+                "YLocation": y,
+                "ZLocation": z,
+                "InitialCapacity": cap
             })
-            seen_resources.add((row["Machine"], "Machine"))
-        
-    for index, row in DataFrame.iterrows(): 
-        # Add tool as a resource if not already added
-        if (row["Tool"], "Resource") not in seen_resources:
+            seen_resources.add((machine_name, "Machine"))
+
+    for _, row in DataFrame.iterrows():
+        # Tools
+        tool_name = row["Tool"]
+        if (tool_name, "Resource") not in seen_resources:
+            x, y, z, cap = lookup_coordinates("Resource", tool_name)
+
+            # Tools use a fixed ObjectType
+            object_type = "Tool"
+
             resources_data.append({
-                "ResourceName": row["Tool"],  # Assuming 'tools' is in the filtered DataFrame
-                "ObjectType": "Resource",  # Use 'Resources' for tools
-                "XLocation": 0,  # Default X location
-                "YLocation": 0,  # Default Y location
-                "ZLocation": 0,  # Default Z location
-                "InitialCapacity": 1  # Default initial capacity
-                })
-            seen_resources.add((row["Tool"], "Resource"))
+                "ResourceName": tool_name,
+                "ObjectType": object_type,
+                "XLocation": x,
+                "YLocation": y,
+                "ZLocation": z,
+                "InitialCapacity": cap
+            })
+            seen_resources.add((tool_name, "Resource"))
 
     return pd.DataFrame(resources_data)
+
 
 def getAllResources(dataframes_list):
     all_resources = pd.DataFrame()

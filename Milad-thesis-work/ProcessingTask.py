@@ -33,7 +33,7 @@ def PartRoutingsWithFullData(file_names):
 
             # Add PartType and PartDestinationID columns
             df['PartType'] = name
-            df['PartDestinationID'] = range(1, len(df) + 1)
+            df['PartDestinationID'] = df.groupby('Machine').cumcount() + 1
 
             # Prefix Machine with "Input@"
             df['Machine'] = "Input@" + df['Machine'].astype(str)
@@ -61,50 +61,53 @@ def PartRoutingsWithFullData(file_names):
 def buildProcessingTasksDF(part_routings_df):
     result_rows = []
 
-    # Group by PartType (one part type at a time)
     for part_type, group in part_routings_df.groupby('PartType'):
-        prev_machine = None  # Track previous machine to manage TaskSeqNum
-        task_seq_counter = 10
-        machine_task_counter = {}  # Track number of tasks per machine
+        machine_indices = {}  # (machine_name) → index (starts from 1)
+        task_counts = {}      # (machine_index) → task counter
 
-        # Iterate over rows for this part type
         for _, row in group.iterrows():
-            machine = row['Machine']
+            feature = row['Feature Name']
+            machine = row['Machine'].replace("Input@", "")  # Clean machine name
             tool = row['Tool']
             proc_time = row['Processing Time']
-            feature_name = row['Feature Name']
 
-            # Increment machine task counter (used in TaskName)
-            machine_task_counter[machine] = machine_task_counter.get(machine, 0) + 1
+            # Assign or reuse machine index
+            if machine not in machine_indices:
+                machine_indices[machine] = len(machine_indices) + 1
+            machine_index = machine_indices[machine]
 
-            # Reset or increment TaskSeqNum
-            task_seq_counter = 10 if machine != prev_machine else task_seq_counter + 10
-            prev_machine = machine
+            # Task counter per machine index
+            key = (part_type, machine_index)
+            task_counts[key] = task_counts.get(key, 0) + 1
+            task_number = task_counts[key]
 
-            # Build TaskName correctly:
-            task_name = (
-                f"{part_type}_{feature_name}_{machine_task_counter[machine]}"
-                if "FinishedPart" not in feature_name
-                else f"{part_type}_Finish"
-            )
+            # TaskSeqNum: 10 * task_number
+            task_seq_num = 10 * task_number
 
-            # Build RandomPro expression (±10%)
+            # TaskName logic
+            if "FinishedPart" not in feature:
+                task_name = f"{part_type}_{machine_index}_{feature}_{task_number}"
+                process_name = f"{part_type}_{machine_index}_{machine}"
+            else:
+                task_name = f"{part_type}_Finish"
+                process_name = f"{part_type}_Complete"
+                task_seq_num = 10  # Always 10 for finish
+
+            # Build RandomPro
             low = round(proc_time * 0.9, 3)
             mode = round(proc_time, 3)
             high = round(proc_time * 1.1, 3)
             random_pro = f"Random.Triangular({low},{mode},{high})"
 
-            # Append row to result list
             result_rows.append({
                 'TaskName': task_name,
-                'Process': row['Process'],
-                'TaskSeqNum': task_seq_counter,
+                'Process': process_name,
+                'TaskSeqNum': task_seq_num,
                 'Tool': tool,
                 'ProcessingTime': proc_time,
                 'RandomPro': random_pro
             })
 
-    # Return result as DataFrame
     return pd.DataFrame(result_rows)
 
 # === Example usage if running directly ===

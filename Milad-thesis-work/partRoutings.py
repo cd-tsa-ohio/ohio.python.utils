@@ -1,40 +1,50 @@
-import os
 import pandas as pd
-import tkinter as tk
-from tkinter import filedialog
+import ou_file_utils as ou
 from feature_selection_module import feature_selection_max
+from ProcessingTask import PartRoutingsWithFullData, buildProcessingTasksDF  
 
-def getDataFramesWithNames():
-    tk.Tk().withdraw()
-    paths = filedialog.askopenfilenames(title="Select CSV files", filetypes=[("CSV Files", "*.csv")])
-    return [(os.path.splitext(os.path.basename(p))[0], pd.read_csv(p)) for p in paths]
+def extract_part_routings(processing_tasks_df):
+    """
+    Generates Part Routings dataframe from Processing Tasks.
+    Returns PartType, PartDestinationID, Machine (with 'Input@'), and Process columns.
+    """
+    if 'Process' not in processing_tasks_df.columns or 'TaskName' not in processing_tasks_df.columns:
+        raise ValueError("Missing required columns in processing_tasks_df")
 
-def PartRoutingsWithFilenames(named_dataframes):
-    try:
-        all_parts = []
-        for name, df in named_dataframes:
-            if 'Machine' not in df.columns:
-                raise ValueError(f"Missing 'Machine' column in file: {name}")
+    # Extract PartType from TaskName (e.g., ANC101_1_SLOT_5 → ANC101)
+    processing_tasks_df['PartType'] = processing_tasks_df['TaskName'].str.extract(r'(^[^_]+)')
 
-            df = feature_selection_max(df).copy()
-            df['PartType'] = name
-            df['PartDestinationID'] = range(1, len(df) + 1)
-            df['Machine'] = "Input@" + df['Machine'].astype(str)
-            df['Process'] = df.apply(lambda r: f"{name}_{r['PartDestinationID']}_{r['Machine'].replace('Input@', '')}", axis=1)
+    # Remove duplicates: one row per PartType + Process
+    routing_df = processing_tasks_df[['PartType', 'Process']].drop_duplicates()
 
-            df = df[['PartType', 'PartDestinationID', 'Machine', 'Process']]
-            df.loc[len(df)] = [name, len(df) + 1, 'Input@FinishedPart', f'{name}_Complete']
-            all_parts.append(df)
+    # Extract machine name from Process and add "Input@" prefix
+    routing_df['Machine'] = routing_df['Process'].apply(lambda p: f"Input@{p.split('_', maxsplit=2)[-1]}")
 
-        return pd.concat(all_parts, ignore_index=True)
-    except Exception as e:
-        print(f"Error: {e}")
-        return pd.DataFrame()
+    # Assign sequential PartDestinationID per PartType
+    routing_df['PartDestinationID'] = routing_df.groupby('PartType').cumcount() + 1
 
+    # Reorder columns
+    routing_df = routing_df[['PartType', 'PartDestinationID', 'Machine', 'Process']]
+
+    return routing_df.reset_index(drop=True)
+
+# === Example usage if running directly ===
 if __name__ == "__main__":
-    part_routings_df = PartRoutingsWithFilenames(getDataFramesWithNames())
-    print(part_routings_df)
+    # Get file names from ou.getFiles()
+    file_names = ou.getFiles()
 
+    # Build PartRoutings DataFrame
+    part_routings_df = PartRoutingsWithFullData(file_names)
 
+    # If no valid data, notify user
+    if part_routings_df.empty:
+        print("No valid part routings found. Please check your CSV files.")
+    else:
+        # Build ProcessingTasks DataFrame
+        processing_tasks_df = buildProcessingTasksDF(part_routings_df)
 
-    
+        # Extract PartRoutings from ProcessingTasks
+        final_part_routing_df = extract_part_routings(processing_tasks_df)
+
+        # Print result
+        print(final_part_routing_df)
