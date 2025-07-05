@@ -1,0 +1,57 @@
+resources needs machine locations and tool capacities.
+object type needs to be also changed to Simio template
+scfdemo is missing machine column     -- toi be resolved when we generaste new csv files
+
+part routings - there should not be consecutive routings for the same machine. see this results:
+
+0     ANC101                  1      Input@CncVMillSlow        ANC101_1_CncVMillSlow
+1     ANC101                  2      Input@CncVMillSlow        ANC101_2_CncVMillSlow
+2     ANC101                  3      Input@CncVMillSlow        ANC101_3_CncVMillSlow
+3     ANC101                  4      Input@CncVMillSlow        ANC101_4_CncVMillSlow
+4     ANC101                  5      Input@CncVMillSlow        ANC101_5_CncVMillSlow
+
+comments on 7/5/25
+Saved excel file should go to the same folder as source csv files.
+
+run-code-files.py
+
+line 27 what is pn? not used
+line 31 
+
+line 34 and 42 are we doing part routing twice?
+line 50 why we do not that for each part? there can not be duplicates between parts, right?
+line 53 resulting fiel shoudl go to the source folder, with that folder name
+
+processingtask.py
+
+line 22 why do you read the file again? you can just pass teh list of dataframes
+line 25 required columsn before for loop
+line 32, did you not apply tis function already? in line 31 of run-code-file
+line 39 and 42, you ar edoing somethign and then removing, why? Can you change the order of statements?
+line 54 do not return empty frame
+line 61 do we use this function? we do... why do we use two separate functions?
+line 90 are we doing this twice?
+line 84,85 why is it not after if in line 88
+
+line 70 again undoing
+
+partRoutings.py
+
+line 14 why do not we get that from partnames? do we need to extract?
+line 21 doing this twice
+line 27 do we need to reorder column?
+line 37 and 47 show that we do it twice. why?
+
+resources.py
+
+line 13 what are we doing here?
+line 25 very dangerous pass, print useful message
+
+line 30 rename the parameter to menmonic name
+line 75 do we need this funtion?
+
+processes.py
+
+
+all files, do not return empty df, raise error
+I do not like from x import why
