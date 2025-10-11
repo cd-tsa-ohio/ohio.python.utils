@@ -24,7 +24,7 @@ line 53 resulting fiel shoudl go to the source folder, with that folder name
 
 processingtask.py
 
-line 22 why do you read the file again? you can just pass teh list of dataframes
+line 22 why do you read the file again? you can just pass the list of dataframes
 line 25 required columsn before for loop
 line 32, did you not apply tis function already? in line 31 of run-code-file
 line 39 and 42, you ar edoing somethign and then removing, why? Can you change the order of statements?
