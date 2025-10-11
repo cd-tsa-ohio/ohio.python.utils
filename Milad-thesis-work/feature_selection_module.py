@@ -62,6 +62,55 @@ def feature_selection_median(df):
         return pd.DataFrame()  # Return an empty DataFrame in case of error
 
 
+
+#Implementing test functions to pick only slow and fast machines for feature selection module
+
+
+def feature_selection_max_slow_first(
+    input_df: pd.DataFrame,
+    feature_col: str = "Feature Name",
+    time_col: str = "Processing Time",
+    machine_col: str | None = None,
+    keyword: str = "Slow",
+    case_sensitive: bool = False,
+) -> pd.DataFrame:
+    """
+    One row per feature:
+      1) If any machine name contains `keyword`, pick the max(time) among those.
+      2) Otherwise, pick the max(time) in the whole feature group.
+    Auto-detects the machine column if not provided.
+    """
+    if feature_col not in input_df.columns or time_col not in input_df.columns:
+        raise ValueError(f"Missing required columns: {[c for c in (feature_col, time_col) if c not in input_df.columns]}")
+
+    # Auto-detect machine column
+    if machine_col is None:
+        for cand in ("Machine Name", "Machine"):
+            if cand in input_df.columns:
+                machine_col = cand
+                break
+        if machine_col is None:
+            raise ValueError("Could not find a machine column. Expected 'Machine Name' or 'Machine'.")
+
+    df = input_df.copy()
+    df[time_col] = pd.to_numeric(df[time_col], errors="coerce")
+
+    picks = []
+    for _, g in df.groupby(feature_col, sort=False, dropna=False):
+        g = g.dropna(subset=[time_col])
+        if g.empty:
+            continue
+
+        # pool 1: machines containing keyword
+        mask = g[machine_col].astype(str).str.contains(keyword, case=case_sensitive, na=False)
+        pool = g[mask] if mask.any() else g
+
+        # pick: row with max processing time (ties -> first occurrence)
+        idx = pool[time_col].idxmax()
+        picks.append(idx)
+
+    return input_df.loc[picks].reset_index(drop=True)
+
 #running the functions to make sure they give correct answer and dataframe format
 
 if __name__ == "__main__":
@@ -75,6 +124,6 @@ if __name__ == "__main__":
     print("Input columns:", df.columns.tolist())
     
     # Run feature selection
-    max_processing_time_df = feature_selection_min(df)
+    max_processing_time_df = feature_selection_max_slow_first(df)
     print("Filtered DataFrame:")
     print(max_processing_time_df)
