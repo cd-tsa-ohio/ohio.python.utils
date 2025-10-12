@@ -124,6 +124,6 @@ if __name__ == "__main__":
     print("Input columns:", df.columns.tolist())
     
     # Run feature selection
-    max_processing_time_df = feature_selection_max_slow_first(df)
+    max_processing_time_df = feature_selection_max_slow_first(df, keyword = "VMillFast")
     print("Filtered DataFrame:")
     print(max_processing_time_df)
