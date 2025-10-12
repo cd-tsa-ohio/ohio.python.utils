@@ -143,10 +143,14 @@ def feature_selection_min_fast_first(
     df[time_col] = pd.to_numeric(df[time_col], errors="coerce")
 
     picks = []
+    currIdx =0
+    keywords = []
     for _, g in df.groupby(feature_col, sort=False, dropna=False):
         g = g.dropna(subset=[time_col])
         if g.empty:
             continue
+        
+        key = keywords [(currIdx + 1) % keywords.size()]
 
 # pool 1: machines containing keyword
         mask = g[machine_col].astype(str).str.contains(keyword, case=case_sensitive, na=False)
@@ -170,7 +174,7 @@ if __name__ == "__main__":
     print("Input columns:", df.columns.tolist())
     
     # Run feature selection
-    max_processing_time_df = feature_selection_max_slow_first(df, keyword = "VMillFast")
-    max_processing_time_df = feature_selection_min_fast_first(df)
+  #  max_processing_time_df = feature_selection_max_slow_first(df, keyword = "VMillFast")
+    max_processing_time_df = feature_selection_min_fast_first(df, keyword = "HMillFast")
     print("Filtered DataFrame:")
     print(max_processing_time_df)
