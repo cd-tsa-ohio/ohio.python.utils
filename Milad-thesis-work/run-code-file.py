@@ -8,7 +8,7 @@ import ProcessingTask as ptask
 import processes as proc
 from parttable import partTable
 
-def makeSimioTables(select_func=fsm.feature_selection_max):
+def makeSimioTables(select_func=fsm.feature_selection_max, pref_mach_list = None, pref_machine - None):
 
     fs_drs = ou.getFilesDataFrames()
 
@@ -28,7 +28,7 @@ def makeSimioTables(select_func=fsm.feature_selection_max):
         df = fs_drs[k]
 
         # === Feature selection ===
-        feat_process = select_func(df)
+        feat_process = select_func(input_df = df, keywords = pref_mach_list, keyword = pref_machine)
 
         # === PartRoutings (raw expanded routing) ===
         part_routing = ptask.PartRoutingsWithFullData([k])
@@ -63,4 +63,8 @@ def makeSimioTables(select_func=fsm.feature_selection_max):
 
 # === Run if script is executed directly ===
 if __name__ == "__main__":
-    makeSimioTables()
+    # input from user function, pref machine list and pref machine
+    func = ""
+    pref_mach_list = []
+    pref_machine = ""
+    makeSimioTables(select_func = func, pref_mach_list = pref_mach_list, pref_machine = pref_machine)
