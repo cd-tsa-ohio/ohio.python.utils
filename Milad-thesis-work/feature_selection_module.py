@@ -167,7 +167,7 @@ def feature_selection_min_PT(
 
 #test try of the logic for rotating amongst the machines
 
-def feature_selection_1(
+def feature_selection_mach_pref_spt(
     input_df: pd.DataFrame,
     feature_col: str = "Feature Name",
     time_col: str = "Processing Time",
@@ -253,7 +253,7 @@ if __name__ == "__main__":
     # Rotate among specific FAST machines first; then fallback to generic "Fast"; then overall min
     fast_keywords = ["4axisMillFast", "HMillFast", "VMillFast"]
 
-    result = feature_selection_1(
+    result = feature_selection_mach_pref_spt(
         df,
         keywords=fast_keywords,   # rotation across these
         keyword="Fast",           # single-keyword fallback
