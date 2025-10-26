@@ -9,7 +9,7 @@ def partName(file_path):
     return file_path[file_path.rfind('/') + 1 : file_path.rfind('.')]
 
 # === Build Part Routings DataFrame with required columns ===
-def PartRoutingsWithFullData(file_names):
+def PartRoutingsWithFullData(file_names, select_func, kwargs):
     try:
         all_parts = []
 
@@ -29,7 +29,8 @@ def PartRoutingsWithFullData(file_names):
                 continue  # Skip this file if columns are missing
 
             # Apply feature selection function
-            df = feature_selection_max(df).copy()
+#            df = feature_selection_max(df).copy()
+            df = select_func (**kwargs).copy()
 
             # Add PartType and PartDestinationID columns
             df['PartType'] = name
