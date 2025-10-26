@@ -41,7 +41,7 @@ def makeSimioTables(select_func, pref_mach_list=None, pref_machine=None, output_
         feat_process = select_func(**call_kwargs)
 
         # build tasks from temporary routing (not saved as a sheet)
-        part_routing_tmp = ptask.PartRoutingsWithFullData([k])
+        part_routing_tmp = ptask.PartRoutingsWithFullData([k], select_func, call_kwargs)
         tasks = ptask.buildProcessingTasksDF(part_routing_tmp)
         taskFrame = pd.concat([taskFrame, tasks], ignore_index=True)
 
