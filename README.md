@@ -8,13 +8,21 @@ pip install -e .
 ## List of functions
 
 getFolderFile
+
 getFile
+
 getFolderFiles
+
 getFiles
+
 getDataFrameFromFile (file)
+
 getDataFrames
+
 getDataFrame
+
 getFolderFilesDataFrames
+
 getFilesDataFrames
 
 ## Environment variables
