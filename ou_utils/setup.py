@@ -12,6 +12,6 @@ setup(
     author="Dusan Sormaz",
     author_email='sormaz@ohio.edu',
     url='https://github.com/cd-tsa-ohio/ohio.python.utils',
-    version='1.0.6'
+    version='1.0.8'
     )
     

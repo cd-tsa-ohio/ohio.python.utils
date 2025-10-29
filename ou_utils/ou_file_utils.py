@@ -6,15 +6,21 @@
 # Version 1.0.4
 # change log
 # Date          Version Author      Content
-# 11/22/2024    1.0.1   D. Sormaz   Intial implementation
+# 11/22/2024    1.0.1   D. Sormaz   Initial implementation
 # 11/27/2024    1.0.2   D. Sormaz   Added multiple file selection options
 # 12/24/2024    1.0.3   D. Sormaz   Read file types from .env file
 # 01/12/2025    1.0.4   D. Sormaz   Implemented getFilesDataFrames, whci returns a dictionary with 
 #                                   files as key and data frames as values
 # 01/18/2025    1.0.5   D. Sormaz   fixed the bug in line 77, call to getDataFrameFromFile()
 # 01/21/2025    1.0.6   D. Sormaz   simplified default values, lines 30 - ...
+# 10/28/2025    1.0.7   D. Sormaz   Added basic error checking if user presses cancel button
+# 10/28/2025    1.0.8   D. Sormaz   Added functionality to return the user selected folder where files are opened
+#                                   Previous functions are kept for backward compatibility
+#                                   functions added: getFolderFile, getFolderFiles, getFolderFilesDataFrames
+
 from decouple import config
 from ast import literal_eval as make_tuple
+from pathlib import Path
 import pandas as pd
 import tkinter as tk
 from tkinter import filedialog
@@ -34,17 +40,29 @@ try:
 except:
     filetypes = filetypes_0
 
-def getFile():
+def getFolderFile():
     root = tk.Tk()
     root.withdraw()
     file_path = filedialog.askopenfilename(title='Select one file', initialdir=DATA_FOLDER, filetypes = filetypes)
-    return file_path
+    if file_path == '':
+        raise RuntimeError("User did not make a selection of a single file. Cannot proceed")
+    return Path(file_path).parent, file_path
 
-def getFiles():
+def getFile():
+    _, file = getFolderFile ()
+    return file
+
+def getFolderFiles():
     root = tk.Tk()
     root.withdraw()
     file_path = filedialog.askopenfilenames(title='Select one or more files',initialdir=DATA_FOLDER, filetypes = filetypes)
-    return file_path
+    if file_path == '':
+        raise RuntimeError("User did not make a selection of multiple files. Cannot proceed")
+    return Path(file_path[0]).parent, file_path
+
+def getFiles():
+    _, files = getFolderFiles()
+    return files
 
 def getDataFrameFromFile(file):
     if file.endswith('xlsx'):
@@ -66,15 +84,24 @@ def getDataFrames():
 def getDataFrame():
         return getDataFrameFromFile(getFile())
 
-def getFilesDataFrames ():
-    files = getFiles()
+def getFolderFilesDataFrames():
+    folder, files = getFolderFiles()
     files_dataframes = {}
     for f in files:
         df = getDataFrameFromFile(f)
         files_dataframes[f] = df
+    return folder, files_dataframes
+
+def getFilesDataFrames ():
+    _, files_dataframes = getFolderFilesDataFrames ()
     return files_dataframes
 
+
 if __name__ == "__main__":
+    print (getFile())
+    fo, fi = getFolderFiles()
+    print (fo)
+    print (fi)
     if SELECTION_MODE.lower() == 'single':
         df = getDataFrame()
         print(df.head())
@@ -83,5 +110,5 @@ if __name__ == "__main__":
         print(f_list)
         df = getDataFrameFromFile(f_list[0])
         print(df.head())
-    else:
+    else: 
         print(f'Incorrect selection mode env variable: {SELECTION_MODE}')
