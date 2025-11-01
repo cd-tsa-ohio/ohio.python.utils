@@ -3,6 +3,7 @@ import pandas as pd
 import random
 import ou_file_utils as ou
 from feature_selection_module import feature_selection_max
+alternate = 'a'
 
 # === Helper function: extract part name from file path ===
 def partName(file_path):
@@ -87,8 +88,8 @@ def buildProcessingTasksDF(part_routings_df):
 
             # TaskName logic
             if "FinishedPart" not in feature:
-                task_name = f"{part_type}_{machine_index}_{feature}_{task_number}"
-                process_name = f"{part_type}_{machine_index}_{machine}"
+                task_name = f"{part_type}_{machine_index}{alternate}_{feature}_{task_number}"
+                process_name = f"{part_type}_{machine_index}{alternate}_{machine}"
             else:
                 task_name = f"{part_type}_Finish"
                 process_name = f"{part_type}_Complete"
